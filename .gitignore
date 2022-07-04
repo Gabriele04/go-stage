@@ -1,0 +1,25 @@
+# ide and editors
+.vscode
+.vs
+.intellij
+.idea
+
+# go tests converage
+coverage.txt
+
+# executables
+*.exe
+main
+mg-api
+
+# custom directories
+/custom
+
+# config file
+config.yaml
+
+# sqltools
+sqltools*
+
+# ruby files
+/tests/.bundle
