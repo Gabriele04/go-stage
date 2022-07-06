@@ -146,7 +146,7 @@ func (s *ServerAPI) registerRoutes(g *echo.Group) {
 
 // registerCityRoutes registers all routes for the API group city.
 func (s *ServerAPI) registerCityRoutes(g *echo.Group) {
-	
+
 	g.POST("", func(c echo.Context) error {
 		var city entity.City
 		if err := c.Bind(&city); err != nil {
@@ -158,7 +158,7 @@ func (s *ServerAPI) registerCityRoutes(g *echo.Group) {
 		}
 
 		return SuccessResponseJSON(c, http.StatusOK, echo.Map{
-				"city": city,
+			"city": city,
 		})
 	})
 
@@ -219,6 +219,31 @@ func (s *ServerAPI) registerCityRoutes(g *echo.Group) {
 		return SuccessResponseJSON(c, http.StatusOK, echo.Map{
 			"city": city,
 		})
+	})
+
+	g.POST("/search", func(c echo.Context) error {
+		var filter service.CityFilter
+		if err := c.Bind(&filter); err != nil {
+			return ErrorResponseJSON(c, apperr.Errorf(apperr.EINTERNAL, "internal error"), nil)
+		}
+
+		cities, err := s.CityService.FindCities(c.Request().Context(), filter)
+		if err != nil {
+			return ErrorResponseJSON(c, err, nil)
+		}
+
+		switch(len(cities)) {
+		case 0:
+			return ErrorResponseJSON(c, apperr.Errorf(apperr.ENOTFOUND, "Nessuna città corrispondente"), nil)
+		case 1:
+			return SuccessResponseJSON(c, http.StatusOK, echo.Map{
+				"city": cities[0],
+			})
+		default:
+			return SuccessResponseJSON(c, http.StatusOK, echo.Map{
+				"cities": cities,
+			})
+		}		
 	})
 }
 
