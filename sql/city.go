@@ -100,6 +100,26 @@ func (s *CityService) FindCityById(ctx context.Context, id int64) (city *entity.
 	return user, nil
 }
 
+func (s *CityService) FindIdByName(ctx context.Context, name string) (*int64, error) {
+
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+
+	id, err := findIdByName(ctx, tx, name)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return nil, apperr.Errorf(apperr.EINTERNAL, "errore: %v", err)
+	}
+
+	return id, nil
+}
+
 func (s *CityService) FindCities(ctx context.Context, filter service.CityFilter) (cities entity.Cities, err error) {
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -228,6 +248,36 @@ func findCityById(ctx context.Context, tx *sql.Tx, id int64) (*entity.City, erro
 	}
 
 	return u[0], nil
+}
+
+func findIdByName(ctx context.Context, tx *sql.Tx, name string) (*int64, error) {
+
+	rows, err := tx.QueryContext(ctx, "SELECT id FROM cities WHERE name = ?", name)
+	if err != nil {
+		return nil, apperr.Errorf(apperr.ENOTFOUND, "city not found")
+	}
+
+	defer rows.Close()
+
+	var Id int64
+
+	if rows.Next() {
+		var city entity.City
+
+		if err := rows.Scan(
+			&city.Id,
+			&city.Name,
+		); err != nil {
+			return nil, apperr.Errorf(apperr.EINTERNAL, "failed to scan city: %v", err)
+		}
+
+		Id = city.Id
+	}
+	if err := rows.Err(); err != nil {
+		return nil, apperr.Errorf(apperr.EINTERNAL, "failed to iterate over cities: %v", err)
+	}
+
+	return &Id, nil
 }
 
 func findCityByPopulation(ctx context.Context, tx *sql.Tx, population int) (entity.Cities, error) {

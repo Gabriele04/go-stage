@@ -12,6 +12,7 @@ type CityService interface {
 	FindCityById(ctx context.Context, id int64) (city *entity.City, err error)
 	FindCityByPopulation(ctx context.Context, population int) (cities entity.Cities, err error)
 	FindCities(ctx context.Context, filter CityFilter) (cities entity.Cities, err error)
+	FindIdByName(ctx context.Context, name string) (*int64, error)
 }
 
 type CityUpdate struct {
