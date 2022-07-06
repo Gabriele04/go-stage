@@ -39,6 +39,8 @@ type ServerAPI struct {
 
 	// Services used by HTTP handler.
 	CityService service.CityService
+
+	Users map[int64]*entity.User
 }
 
 // NewServerAPI creates a new API server.
@@ -232,18 +234,13 @@ func (s *ServerAPI) registerCityRoutes(g *echo.Group) {
 			return ErrorResponseJSON(c, err, nil)
 		}
 
-		switch(len(cities)) {
-		case 0:
+		if len(cities) == 0 {
 			return ErrorResponseJSON(c, apperr.Errorf(apperr.ENOTFOUND, "Nessuna città corrispondente"), nil)
-		case 1:
-			return SuccessResponseJSON(c, http.StatusOK, echo.Map{
-				"city": cities[0],
-			})
-		default:
-			return SuccessResponseJSON(c, http.StatusOK, echo.Map{
-				"cities": cities,
-			})
-		}		
+		}
+
+		return SuccessResponseJSON(c, http.StatusOK, echo.Map{
+			"cities": cities,
+		})
 	})
 }
 
