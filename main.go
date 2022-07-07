@@ -3,12 +3,9 @@ package main
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"log"
-	"mysql/app/entity"
-	"mysql/app/service"
 	"mysql/http"
-	apphttp "mysql/http"
+	"mysql/jwt"
 	appsql "mysql/sql"
 	"os"
 	"os/signal"
@@ -47,11 +44,14 @@ func main() {
 func run(ctx context.Context, db *sql.DB) error {
 
 	sqlCityService := appsql.NewCityService(db)
+	jwtService := jwt.NewJWTService("sdvh1u5ha2sdf")
 
-	HTTPServerAPI := apphttp.NewServerAPI()
+	HTTPServerAPI := http.NewServerAPI()
 
 	HTTPServerAPI.Addr = ":8080"
 	HTTPServerAPI.CityService = sqlCityService
+
+	HTTPServerAPI.JwtService = jwtService
 
 	if err := HTTPServerAPI.Open(); err != nil {
 		return err
@@ -66,7 +66,7 @@ func run(ctx context.Context, db *sql.DB) error {
 	return nil
 }
 
-func testSql() {
+/*func testSql() {
 
 	db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:3306)/go-test?parseTime=true")
 	if err != nil {
@@ -94,9 +94,9 @@ func testSql() {
 		panic(err)
 	}
 
-	/*if err := sqlCityService.DeleteCity(ctx, 4); err != nil {
+	if err := sqlCityService.DeleteCity(ctx, 4); err != nil {
 		panic(err)
-	}*/
+	}
 
 	newPop := 0
 	cup := service.CityUpdate{Population: &newPop}
@@ -142,7 +142,7 @@ func testSql() {
 	if err := printTable(ctx, db, sqlCityService); err != nil {
 		panic(err)
 	}
-}
+}*/
 
 /*func createCity(db *sql.DB, city *City) error {
 	sql := "INSERT INTO cities(name, population) VALUES (?,?)"
@@ -202,7 +202,7 @@ func updateCityByName(db *sql.DB, name string, newPopulation int) error {
 	return nil
 }*/
 
-func printTable(ctx context.Context, db *sql.DB, cityService service.CityService) error {
+/*func printTable(ctx context.Context, db *sql.DB, cityService service.CityService) error {
 
 	cities, err := cityService.FindCities(ctx, service.CityFilter{})
 	if err != nil {
@@ -213,4 +213,4 @@ func printTable(ctx context.Context, db *sql.DB, cityService service.CityService
 	}
 
 	return nil
-}
+}*/

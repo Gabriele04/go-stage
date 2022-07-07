@@ -19,6 +19,12 @@ type JWTService struct {
 	Secret string
 }
 
+func NewJWTService(secret string) *JWTService {
+	return &JWTService{
+		Secret: secret,
+	}
+}
+
 // Exchange implements service.JWTService
 func (s *JWTService) Exchange(ctx context.Context, user *entity.User) (*entity.TokenPair, error) {
 	select {
