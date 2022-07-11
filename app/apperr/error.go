@@ -67,7 +67,7 @@ func ErrorMessage(err error) string {
 }
 
 // Errorf is a helper function to return an Error with a given code and formatted message.
-func Errorf(code string, format string, args ...interface{}) *Error {
+func Error(code string, format string, args ...interface{}) *Error {
 	return &Error{
 		Code:    code,
 		Message: fmt.Sprintf(format, args...),
